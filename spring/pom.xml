@@ -71,6 +71,11 @@
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                         </path>
+                        <path>
+                            <groupId>com.dslplatform</groupId>
+                            <artifactId>dsl-json-processor</artifactId>
+                            <version>1.10.0</version>
+                        </path>
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
