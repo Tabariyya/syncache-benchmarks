@@ -12,7 +12,7 @@
         <dependency>
             <groupId>io.github.waleedsda</groupId>
             <artifactId>synCache-java</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.3</version>
         </dependency>
 
         <dependency>
@@ -38,6 +38,13 @@
             <artifactId>redisson</artifactId>
             <version>3.22.0</version>
         </dependency>
+        <dependency>
+            <groupId>io.lettuce</groupId>
+            <artifactId>lettuce-core</artifactId>
+            <version>6.3.0.RELEASE</version>
+        </dependency>
+
+
     </dependencies>
 
     <properties>
