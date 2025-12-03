@@ -54,7 +54,7 @@
         <dependency>
             <groupId>io.github.waleedsda</groupId>
             <artifactId>syncache-spring-boot-starter</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.4</version>
         </dependency>
 
 
