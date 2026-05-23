@@ -58,6 +58,13 @@ cd c-benchmark
 docker compose up --build
 ```
 
+### Java benchmark
+
+```bash
+cd java-benchmark
+docker compose up --build
+```
+
 Both benchmarks self-download the SynCache library during the Docker build — no manual installation required. CMake fetches the correct pre-built binary for the target platform (Linux amd64 or arm64) from the [SynCache releases](https://github.com/Tabariyya/syncache-releases/releases).
 
 ## Example output
@@ -100,6 +107,11 @@ syncache-benchmarks/
 ├── c-benchmark/          C benchmark (uses synCache/controller_c.h)
 │   ├── benchmark.c
 │   ├── CMakeLists.txt
+│   ├── Dockerfile
+│   └── docker-compose.yml
+├── java-benchmark/       Java benchmark (uses com.tabariyya:syncache)
+│   ├── src/main/java/benchmark/Benchmark.java
+│   ├── pom.xml
 │   ├── Dockerfile
 │   └── docker-compose.yml
 └── .env                  Your token and connection config (not committed)
