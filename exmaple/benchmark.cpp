@@ -177,26 +177,19 @@ static void print_speedup(const char *op,
 
 int main() {
     // ── Redis ──────────────────────────────────────────────────────────────────
-    const char *host = std::getenv("REDIS_HOST");
-    int port = std::stoi(std::getenv("REDIS_PORT"));
+    const char *host = "host.docker.internal";
+    int port = 23379;
 
     redisContext *rc = redisConnect(host, port);
-    if (!rc || rc->err) {
-        std::cerr << "Redis connect failed: " << (rc ? rc->errstr : "OOM") << "\n"
-                << "  Start Redis with:  redis-server\n"
-                << "  Override via REDIS_HOST / REDIS_PORT env vars.\n";
-        if (rc) redisFree(rc);
-        return 1;
-    }
     freeReplyObject(static_cast<redisReply *>(redisCommand(rc, "SELECT 15")));
     freeReplyObject(static_cast<redisReply *>(redisCommand(rc, "FLUSHDB")));
 
     // ── PostgreSQL ─────────────────────────────────────────────────────────────
-    const char *pg_host = std::getenv("PG_HOST");
-    const char *pg_port = std::getenv("PG_PORT");
-    const char *pg_user = std::getenv("PG_USER");
-    const char *pg_pass = std::getenv("PG_PASSWORD");
-    const char *pg_dbname = std::getenv("PG_DBNAME");
+    const char *pg_host = "host.docker.internal";
+    const char *pg_port = "49432";
+    const char *pg_user = "postgres";
+    const char *pg_pass = "postgres";
+    const char *pg_dbname = "benchmark";
 
     std::string connstr;
     connstr = "host=";
