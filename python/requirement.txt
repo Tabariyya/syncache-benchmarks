@@ -1,3 +1,0 @@
-pysyncache==0.0.1
-Flask
-Flask-SQLAlchemy
