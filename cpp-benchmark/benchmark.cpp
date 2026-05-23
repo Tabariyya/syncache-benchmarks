@@ -189,7 +189,7 @@ int main() {
     const char *pg_port = "49432";
     const char *pg_user = "postgres";
     const char *pg_pass = "postgres";
-    const char *pg_dbname = "benchmark";
+    const char *pg_dbname = "benchmark-cpp";
 
     std::string connstr;
     connstr = "host=";

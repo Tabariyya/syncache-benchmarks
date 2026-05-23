@@ -6,20 +6,10 @@ set(CMAKE_CXX_STANDARD 17)
 
 
 set(SYNCACHE_VERSION "1.0.5")
-set(_FETCH_SCRIPT "${CMAKE_BINARY_DIR}/FetchSynCache.cmake")
-if(NOT EXISTS "${_FETCH_SCRIPT}")
-    file(DOWNLOAD
-        "https://github.com/Tabariyya/syncache-releases/releases/download/v${SYNCACHE_VERSION}/FetchSynCache.cmake"
-        "${_FETCH_SCRIPT}"
-        STATUS _DL_STATUS
-    )
-    list(GET _DL_STATUS 0 _DL_CODE)
-    if(NOT _DL_CODE EQUAL 0)
-        list(GET _DL_STATUS 1 _DL_MSG)
-        message(FATAL_ERROR "[SynCache] Failed to download FetchSynCache.cmake: ${_DL_MSG}")
-    endif()
-endif()
-include("${_FETCH_SCRIPT}")
+file(DOWNLOAD
+    "https://github.com/Tabariyya/syncache-releases/releases/download/v${SYNCACHE_VERSION}/FetchSynCache.cmake"
+    "${CMAKE_BINARY_DIR}/FetchSynCache.cmake")
+include("${CMAKE_BINARY_DIR}/FetchSynCache.cmake")
 
 find_package(PostgreSQL REQUIRED)
 
