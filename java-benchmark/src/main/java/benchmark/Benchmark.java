@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 public class Benchmark {
 
-    private static final int WARMUP_N = 500;
+    private static final int WARMUP_N = 5000;
     private static final int BENCH_N  = 100_000;
     private static final String VALUE  = "{\"schema\":1,\"source\":\"syncache-benchmark\",";
     private static final String SEP    = "-------------------------------------------------------------------";

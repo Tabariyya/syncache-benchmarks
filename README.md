@@ -91,8 +91,8 @@ PostgreSQL GET               7204.9 ms       13880 ops/s     72049.1 ns/op
 ...
 
   Results — GET:
-  SynCache GET is 352.9x faster than Redis
-  SynCache GET is 1494.8x faster than PostgreSQL
+  SynCache GET is 100x faster than Redis
+  SynCache GET is 150x faster than PostgreSQL
 ```
 
 ## Repository structure

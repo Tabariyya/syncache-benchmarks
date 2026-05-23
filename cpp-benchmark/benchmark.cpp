@@ -11,7 +11,7 @@
 #include <synCache/Controller.hpp>
 
 
-constexpr int WARMUP_N = 500; // SynCache & Redis warm-up iterations
+constexpr int WARMUP_N = 5000; // SynCache & Redis warm-up iterations
 constexpr int BENCH_N = 100000; // SynCache & Redis (in-process / loopback)
 
 static const std::string VALUE = [] {

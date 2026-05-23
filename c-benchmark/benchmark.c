@@ -8,7 +8,7 @@
 #include <libpq-fe.h>
 #include <synCache/controller_c.h>
 
-#define WARMUP_N 500
+#define WARMUP_N 5000
 #define BENCH_N  100000
 
 static const char VALUE[] = "{\"schema\":1,\"source\":\"syncache-benchmark\",";
