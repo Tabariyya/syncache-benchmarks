@@ -11,6 +11,11 @@ services:
       --dynamic-hz yes
       --no-appendfsync-on-rewrite yes
       --loglevel warning
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
 
   postgres:
     image: postgres:16-alpine
@@ -33,13 +38,20 @@ services:
       -c effective_cache_size=512MB
       -c random_page_cost=1.1
       -c logging_collector=off
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d benchmark"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
 
   benchmark:
     build: .
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
-      - redis
-      - postgres
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     env_file:
       - ../.env
