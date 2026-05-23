@@ -1,0 +1,45 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "23379:6379"
+    command: >
+      redis-server
+      --save ""
+      --appendonly no
+      --hz 100
+      --dynamic-hz yes
+      --no-appendfsync-on-rewrite yes
+      --loglevel warning
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: benchmark
+    ports:
+      - "49432:5432"
+    command: >
+      postgres
+      -c fsync=off
+      -c synchronous_commit=off
+      -c full_page_writes=off
+      -c checkpoint_completion_target=0.9
+      -c wal_level=minimal
+      -c max_wal_senders=0
+      -c shared_buffers=256MB
+      -c work_mem=64MB
+      -c effective_cache_size=512MB
+      -c random_page_cost=1.1
+      -c logging_collector=off
+
+  benchmark:
+    build: .
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - redis
+      - postgres
+    env_file:
+      - ../.env
