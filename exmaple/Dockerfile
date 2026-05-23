@@ -8,8 +8,6 @@ RUN apt-get update && apt-get install -y \
     git \
     libhiredis-dev \
     libpq-dev \
-    libhiredis0.14 \
-    libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
 
@@ -19,4 +17,6 @@ COPY CMakeLists.txt benchmark.cpp ./
 
 RUN cmake -B build -DCMAKE_BUILD_TYPE=Release && \
     cmake --build build --parallel
+
+ENTRYPOINT ["/src/build/SynCacheBenchmark"]
 

@@ -10,14 +10,10 @@
 #include <libpq-fe.h>
 #include <synCache/Controller.hpp>
 
-// Token from main.cpp — override with SYNCACHE_TOKEN env var.
-static const std::string BROKER_TOKEN =
-        "eyJhbGciOiJFUzI1NiJ9.eyJicm9rZXJVUkwiOiJ3c3M6Ly9icm9rZXIuc3luY2FjaGUudGFiYXJpeXlhLmNvbS8iLCJjb21wYW55TmFtZSI6IlRlc3R0dHR0dCIsImluc3RhbmNlTnVtYmVyIjo1LCJwcm9qZWN0TmFtZSI6InRlc3R0dHR0IiwiZXhwIjoxODEwNzE2MTU1LCJ0eXBlIjoiSU5TVEFOQ0UiLCJpYXQiOjE3NzkxODAxNTV9.4yBzO_UUOt6V8ORoPlxTzR0y0x5KDwVh1NRlfGRDIwI5ff9vFsQOj1kuB0l2YproR1FH_hweWUmknQHz1oNx5w";
 
 constexpr int WARMUP_N = 500; // SynCache & Redis warm-up iterations
 constexpr int BENCH_N = 100000; // SynCache & Redis (in-process / loopback)
 
-// ~1 KB JSON payload — identical bytes sent to all three backends
 static const std::string VALUE = [] {
     std::string v;
     v = R"({"schema":1,"source":"syncache-benchmark",)";
@@ -181,10 +177,8 @@ static void print_speedup(const char *op,
 
 int main() {
     // ── Redis ──────────────────────────────────────────────────────────────────
-    const char *rhost = std::getenv("REDIS_HOST");
-    const char *rport = std::getenv("REDIS_PORT");
-    const char *host = rhost ? rhost : "127.0.0.1";
-    int port = rport ? std::stoi(rport) : 6379;
+    const char *host = std::getenv("REDIS_HOST");
+    int port = std::stoi(std::getenv("REDIS_PORT"));
 
     redisContext *rc = redisConnect(host, port);
     if (!rc || rc->err) {
@@ -198,11 +192,11 @@ int main() {
     freeReplyObject(static_cast<redisReply *>(redisCommand(rc, "FLUSHDB")));
 
     // ── PostgreSQL ─────────────────────────────────────────────────────────────
-    const char *pg_host = std::getenv("PG_HOST") ? std::getenv("PG_HOST") : "127.0.0.1";
-    const char *pg_port = std::getenv("PG_PORT") ? std::getenv("PG_PORT") : "5432";
-    const char *pg_user = std::getenv("PG_USER") ? std::getenv("PG_USER") : "postgres";
-    const char *pg_pass = std::getenv("PG_PASSWORD") ? std::getenv("PG_PASSWORD") : "postgres";
-    const char *pg_dbname = std::getenv("PG_DBNAME") ? std::getenv("PG_DBNAME") : "moltbook";
+    const char *pg_host = std::getenv("PG_HOST");
+    const char *pg_port = std::getenv("PG_PORT");
+    const char *pg_user = std::getenv("PG_USER");
+    const char *pg_pass = std::getenv("PG_PASSWORD");
+    const char *pg_dbname = std::getenv("PG_DBNAME");
 
     std::string connstr;
     connstr = "host=";
@@ -245,7 +239,13 @@ int main() {
 
     // ── SynCache ───────────────────────────────────────────────────────────────
     const char *tok = std::getenv("SYNCACHE_TOKEN");
-    Controller cache(tok ? std::string(tok) : BROKER_TOKEN, 2000000);
+    if (!tok || !*tok) {
+        std::cerr << "SYNCACHE_TOKEN env var is required.\n";
+        PQfinish(pg);
+        redisFree(rc);
+        return 1;
+    }
+    Controller cache(tok, 2000000);
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     // ── Banner ─────────────────────────────────────────────────────────────────
