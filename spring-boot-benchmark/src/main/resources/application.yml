@@ -1,0 +1,7 @@
+spring:
+  main:
+    web-application-type: none
+  data:
+    redis:
+      host: host.docker.internal
+      port: 23379

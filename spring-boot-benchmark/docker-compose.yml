@@ -1,0 +1,28 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "23379:6379"
+    command: >
+      redis-server
+      --save ""
+      --appendonly no
+      --hz 100
+      --dynamic-hz yes
+      --no-appendfsync-on-rewrite yes
+      --loglevel warning
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+
+  benchmark:
+    build: .
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      redis:
+        condition: service_healthy
+    env_file:
+      - ../.env
