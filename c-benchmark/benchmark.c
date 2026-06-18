@@ -6,7 +6,7 @@
 
 #include <hiredis/hiredis.h>
 #include <libpq-fe.h>
-#include <synCache/controller_c.h>
+#include <synCache/cache_c.h>
 
 #define WARMUP_N 5000
 #define BENCH_N  100000
@@ -37,33 +37,33 @@ static void bkey(int i, char *buf, size_t buf_size) {
 
 // ─── SynCache ops ─────────────────────────────────────────────────────────────
 
-static Stat sc_set(controller_handle_t *c, int n) {
+static Stat sc_set(int n) {
     char key[32];
     double t0 = now_ns();
     for (int i = 0; i < n; ++i) {
         bkey(i, key, sizeof(key));
-        controller_set_string(c, "bench", key, VALUE, NULL);
+        cache_set_string("bench", key, VALUE, NULL);
     }
     return make_stat(n, t0, now_ns());
 }
 
-static Stat sc_get(controller_handle_t *c, int n) {
+static Stat sc_get(int n) {
     char key[32];
     double t0 = now_ns();
     for (int i = 0; i < n; ++i) {
         bkey(i, key, sizeof(key));
-        char *val = controller_get_string(c, "bench", key);
-        controller_free(val);
+        char *val = cache_get_string("bench", key);
+        cache_free(val);
     }
     return make_stat(n, t0, now_ns());
 }
 
-static Stat sc_evict(controller_handle_t *c, int n) {
+static Stat sc_evict(int n) {
     char key[32];
     double t0 = now_ns();
     for (int i = 0; i < n; ++i) {
         bkey(i, key, sizeof(key));
-        controller_evict(c, "bench", key);
+        cache_evict("bench", key);
     }
     return make_stat(n, t0, now_ns());
 }
@@ -219,7 +219,7 @@ int main(void) {
         return 1;
     }
 
-    controller_handle_t *cache = controller_create(tok, 200000); // 2x BENCH_N entries
+    cache_init(tok, 200000); // 2x BENCH_N entries
     sleep(1);
 
     // ── Banner ─────────────────────────────────────────────────────────────────
@@ -237,8 +237,8 @@ int main(void) {
     // ── Warm-up ────────────────────────────────────────────────────────────────
     printf("\n  Warming up (%d ops each)... ", WARMUP_N);
     fflush(stdout);
-    sc_set(cache, WARMUP_N);
-    sc_get(cache, WARMUP_N);
+    sc_set(WARMUP_N);
+    sc_get(WARMUP_N);
     rd_set(rc, WARMUP_N);
     rd_get(rc, WARMUP_N);
     pg_set(pg, WARMUP_N);
@@ -248,19 +248,19 @@ int main(void) {
 
     // ── SET ────────────────────────────────────────────────────────────────────
     print_header();
-    Stat sc_s = sc_set(cache, BENCH_N); print_row("SynCache SET",   sc_s);
+    Stat sc_s = sc_set(BENCH_N); print_row("SynCache SET",   sc_s);
     Stat rd_s = rd_set(rc,    BENCH_N); print_row("Redis    SET",   rd_s);
     Stat pg_s = pg_set(pg,    BENCH_N); print_row("PostgreSQL SET", pg_s);
     printf("\n");
 
     // ── GET ────────────────────────────────────────────────────────────────────
-    Stat sc_g = sc_get(cache, BENCH_N); print_row("SynCache GET",   sc_g);
+    Stat sc_g = sc_get(BENCH_N); print_row("SynCache GET",   sc_g);
     Stat rd_g = rd_get(rc,    BENCH_N); print_row("Redis    GET",   rd_g);
     Stat pg_g = pg_get(pg,    BENCH_N); print_row("PostgreSQL GET", pg_g);
     printf("\n");
 
     // ── EVICT / DEL ────────────────────────────────────────────────────────────
-    Stat sc_e = sc_evict(cache, BENCH_N); print_row("SynCache EVICT", sc_e);
+    Stat sc_e = sc_evict(BENCH_N); print_row("SynCache EVICT", sc_e);
     Stat rd_e = rd_del(rc,      BENCH_N); print_row("Redis    DEL",   rd_e);
     Stat pg_e = pg_del(pg,      BENCH_N); print_row("PostgreSQL DEL", pg_e);
 
@@ -294,6 +294,5 @@ int main(void) {
     redisFree(rc);
     PQclear(PQexec(pg, "TRUNCATE bench_kv"));
     PQfinish(pg);
-    controller_destroy(cache);
     return 0;
 }

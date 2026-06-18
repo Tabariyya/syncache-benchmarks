@@ -4,7 +4,7 @@ project(SynCacheCBenchmark C CXX)
 
 set(CMAKE_C_STANDARD 11)
 
-set(SYNCACHE_VERSION "1.0.5")
+set(SYNCACHE_VERSION "1.0.6")
 file(DOWNLOAD
     "https://github.com/Tabariyya/syncache-releases/releases/download/v${SYNCACHE_VERSION}/FetchSynCache.cmake"
     "${CMAKE_BINARY_DIR}/FetchSynCache.cmake")

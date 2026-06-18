@@ -5,7 +5,10 @@ project(SynCacheExample CXX)
 set(CMAKE_CXX_STANDARD 17)
 
 
-set(SYNCACHE_VERSION "1.0.5")
+set(SYNCACHE_VERSION "1.0.6")
+
+
+
 file(DOWNLOAD
     "https://github.com/Tabariyya/syncache-releases/releases/download/v${SYNCACHE_VERSION}/FetchSynCache.cmake"
     "${CMAKE_BINARY_DIR}/FetchSynCache.cmake")
@@ -24,5 +27,7 @@ set_target_properties(hiredis::hiredis PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${HIREDIS_INCLUDE_DIR}"
 )
 
+find_package(Threads REQUIRED)
+
 add_executable(SynCacheBenchmark benchmark.cpp)
-target_link_libraries(SynCacheBenchmark PRIVATE synCache::synCache hiredis::hiredis PostgreSQL::PostgreSQL)
+target_link_libraries(SynCacheBenchmark PRIVATE synCache::synCache hiredis::hiredis PostgreSQL::PostgreSQL Threads::Threads)
